@@ -4,10 +4,10 @@ package s4m.exercise1
 
 import org.scalatest._
 import shapeless._
-
 import s4m.smbd.api._
 import s4m.smbd.impl._
 import s4m.smbd.syntax._
+import shapeless.labelled._
 
 package api {
   sealed trait Receptacle
@@ -23,6 +23,23 @@ package object formats {
   import s4m.exercise1.api._
 
   implicit val TeapotF: BigDataFormat[Teapot] = cachedImplicit
+  implicitly[BigDataFormat[Bottle]]
+  implicitly[BigDataFormat[Glass.type]]
+  implicitly[BigDataFormat[CNil]]
+  val f1 = 'a
+  type aT1 = f1.type
+
+  val f2 = 'b
+  type aT2 = f1.type
+
+  type h1 = FieldType[aT1,String] :: HNil
+  type h2 = FieldType[aT2,String] :: HNil
+  type cp1 = FieldType[aT1,h1] :+: FieldType[aT2,h2] :+: CNil
+
+
+  implicitly[BigDataFormat[cp1]]
+  implicitly[LabelledGeneric[Bottle]]
+  implicitly[LabelledGeneric[Receptacle]]
 
   // if you get compiler errors for ReceptacleF, uncomment these to
   // help find which implicit is not being found:
@@ -61,7 +78,7 @@ package app {
       val stringyMap = new StringyMap()
       stringyMap.put("z", "foo")
 
-      TeapotF.fromProperties(stringyMap) shouldBe Left("some sensible error here")
+      TeapotF.fromProperties(stringyMap) shouldBe Left("missing key a")
     }
 
     it should "round trip sealed traits" in {
