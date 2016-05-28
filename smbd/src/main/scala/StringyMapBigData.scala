@@ -171,7 +171,7 @@ package object impl {
 }
 
 package impl {
-  import api._
+  //import api._
 
   // EXERCISE 1.2 goes here
 }
